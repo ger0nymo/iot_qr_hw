@@ -30,6 +30,7 @@
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "mssql": "^3.3.0",
+    "qrcode": "^1.5.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "uuid": "^9.0.0"

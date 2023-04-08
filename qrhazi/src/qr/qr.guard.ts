@@ -3,14 +3,17 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  HttpStatus,
+  HttpCode,
+  HttpException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
+import { jwtConstants } from '../auth/constants';
 import { Request } from 'express';
 import { UsersService } from './../users/users.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class QRGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService
@@ -26,10 +29,15 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
+
+      if (payload.hasOwnProperty('isQrCode') === false) {
+        request.invalidQrCode = true;
+      }
+
       let user = await this.usersService.findOneByName(payload.username);
 
       if (!user) {
-        throw new UnauthorizedException();
+        throw new HttpException('Invalid QR code.', HttpStatus.BAD_REQUEST);
       }
       request.user = user;
     } catch {

@@ -12,7 +12,10 @@ export class UsersService {
     const { resources } = await this.userContainer.items
       .query<User>(query)
       .fetchAll();
-    return resources[0] || { message: 'User not found.' };
+
+    return (
+      resources[0] || { message: `User not found with username ${username}.` }
+    );
   }
 
   async create(user: User): Promise<User | any> {
