@@ -7,7 +7,12 @@ export async function register(
   email: string,
   password: string
 ) {
-  return 'register';
+  const result = await axios.post(`${API_URL}/register`, {
+    username: username,
+    password: password,
+    email: email,
+  });
+  return result;
 }
 
 export async function login(username: string, password: string) {

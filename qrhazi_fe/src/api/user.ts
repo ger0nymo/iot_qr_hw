@@ -29,6 +29,7 @@ export async function retrieveUser() {
     email: result.data.email,
     canEnter: result.data.canEnter,
   };
-  return user;
+
   console.log(user);
+  return user;
 }

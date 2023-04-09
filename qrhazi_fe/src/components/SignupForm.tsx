@@ -19,6 +19,9 @@ import IconButton from '@mui/material/IconButton';
 import { CircularProgress } from '@mui/material/';
 import { retrieveUser } from '../api/user';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../api/auth';
+import { Alert } from '@mui/material';
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 
 const theme = createTheme({
   palette: {
@@ -32,7 +35,12 @@ export default function SignUp() {
   const [emailError, setEmailError] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const navigate = useNavigate();
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   React.useEffect(() => {
     getUserData();
@@ -57,50 +65,84 @@ export default function SignUp() {
   const validateUsername = (username: string) => {
     if (username.length < 3) {
       setUsernameError('Username must be at least 3 characters long');
+      return false;
     } else if (username.length > 15) {
       setUsernameError('Username must be at most 15 characters long');
+      return false;
     } else if (username.includes(' ')) {
       setUsernameError('Username must not contain spaces');
+      return false;
     } else {
       setUsernameError('');
+      return true;
     }
   };
 
   const validatePassword = (password: string) => {
     if (password.length < 6) {
       setPasswordError('Password must be at least 6 characters long');
+      return false;
     } else if (password.length > 20) {
       setPasswordError('Password must be at most 20 characters long');
+      return false;
     } else {
       setPasswordError('');
+      return true;
     }
   };
 
   const validateEmail = (email: string) => {
     if (email.length < 1) {
       setEmailError('Email is required');
-      return;
+      return false;
     }
     const emailRegex =
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (!emailRegex.test(email)) {
       setEmailError('Email is not valid');
+      return false;
     } else {
       setEmailError('');
+      return true;
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     validateUsername(data.get('username') as string);
     validatePassword(data.get('password') as string);
     validateEmail(data.get('email') as string);
 
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const canSubmit =
+      validateUsername(data.get('username') as string) &&
+      validatePassword(data.get('password') as string) &&
+      validateEmail(data.get('email') as string);
+
+    if (canSubmit) {
+      try {
+        const result = await register(
+          data.get('username') as string,
+          data.get('email') as string,
+          data.get('password') as string
+        );
+
+        console.log(result);
+        const token = result.data['access_token'];
+        const expireDate = new Date(
+          new Date().getTime() + 2 * 24 * 60 * 60 * 1000
+        ).toUTCString();
+        const cookieString = `token=${token}; expires=${expireDate};`;
+
+        document.cookie = cookieString;
+
+        if (result.status === 201) {
+          navigate('/');
+        }
+      } catch (error) {
+        setSnackbarOpen(true);
+      }
+    }
   };
 
   return !loading ? (
@@ -196,6 +238,16 @@ export default function SignUp() {
                 </Link>
               </Grid>
             </Grid>
+            <Snackbar
+              open={snackbarOpen}
+              autoHideDuration={2500}
+              onClose={handleSnackbarClose}
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+              <Alert severity='error'>
+                Error while signing up. Please try again later.
+              </Alert>
+            </Snackbar>
           </Box>
         </Box>
       </Container>
