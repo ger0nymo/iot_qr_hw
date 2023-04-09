@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://iot-qr-hw-u9bn.vercel.app/auth';
+const API_URL = 'https://iot-qr-hw-i0sk1n.vercel.app/auth';
 
 export async function register(
   username: string,
