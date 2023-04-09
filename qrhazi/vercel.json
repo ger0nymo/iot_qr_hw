@@ -15,11 +15,7 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
-      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
-    },
-    {
-      "source": "/iot-qr-hw-u9bn.vercel.app/(.*)",
+      "source": "iot-qr-hw.vercel.app/(.*)",
       "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
     }
   ]
