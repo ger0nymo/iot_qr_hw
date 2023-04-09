@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://iotqrhw-production.up.railway.app/auth';
+const API_URL = 'https://qrhazi-backend.azurewebsites.net/auth';
 
 export async function register(
   username: string,
