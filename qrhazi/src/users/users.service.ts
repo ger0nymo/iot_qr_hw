@@ -13,9 +13,7 @@ export class UsersService {
       .query<User>(query)
       .fetchAll();
 
-    return (
-      resources[0] || { message: `User not found with username ${username}.` }
-    );
+    return resources[0] || null;
   }
 
   async create(user: User): Promise<User | any> {

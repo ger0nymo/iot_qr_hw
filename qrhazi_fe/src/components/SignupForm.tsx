@@ -15,34 +15,28 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import IconButton from '@mui/material/IconButton';
-import { register, login } from '../api/auth';
-import { Alert } from '@mui/material';
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
-import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material/';
 import { retrieveUser } from '../api/user';
-import { CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const isDarkStored = localStorage.getItem('isDarkTheme') === 'true';
+const theme = createTheme({
+  palette: {
+    mode: localStorage.getItem('isDarkTheme') === 'true' ? 'dark' : 'light',
+  },
+});
 
-export default function SignIn() {
+export default function SignUp() {
   const [usernameError, setUsernameError] = React.useState('');
   const [passwordError, setPasswordError] = React.useState('');
+  const [emailError, setEmailError] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
-  const [isDarkTheme, setIsDarkTheme] = React.useState(isDarkStored);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-
   const navigate = useNavigate();
 
   React.useEffect(() => {
     getUserData();
   }, []);
-
-  React.useEffect(() => {
-    localStorage.setItem('isDarkTheme', isDarkTheme.toString());
-  }, [isDarkTheme]);
 
   const getUserData = async () => {
     const user = await retrieveUser();
@@ -50,22 +44,6 @@ export default function SignIn() {
       navigate('/');
     }
     setLoading(false);
-  };
-
-  const light = createTheme({
-    palette: {
-      mode: 'light',
-    },
-  });
-
-  const dark = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  });
-
-  const changeTheme = () => {
-    setIsDarkTheme((isDarkTheme) => !isDarkTheme);
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -76,75 +54,57 @@ export default function SignIn() {
     event.preventDefault();
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
   const validateUsername = (username: string) => {
     if (username.length < 3) {
       setUsernameError('Username must be at least 3 characters long');
-      return false;
     } else if (username.length > 15) {
       setUsernameError('Username must be at most 15 characters long');
-      return false;
     } else if (username.includes(' ')) {
       setUsernameError('Username must not contain spaces');
-      return false;
     } else {
       setUsernameError('');
-      return true;
     }
   };
 
   const validatePassword = (password: string) => {
     if (password.length < 6) {
       setPasswordError('Password must be at least 6 characters long');
-      return false;
     } else if (password.length > 20) {
       setPasswordError('Password must be at most 20 characters long');
-      return false;
     } else {
       setPasswordError('');
-      return true;
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const validateEmail = (email: string) => {
+    if (email.length < 1) {
+      setEmailError('Email is required');
+      return;
+    }
+    const emailRegex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('Email is not valid');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
+    validateUsername(data.get('username') as string);
     validatePassword(data.get('password') as string);
+    validateEmail(data.get('email') as string);
 
-    const canSubmit =
-      validateUsername(data.get('username') as string) &&
-      validatePassword(data.get('password') as string);
-
-    if (canSubmit) {
-      try {
-        const result = await login(
-          data.get('username') as string,
-          data.get('password') as string
-        );
-
-        const token = result.data['access_token'];
-        const expireDate = new Date(
-          new Date().getTime() + 2 * 24 * 60 * 60 * 1000
-        ).toUTCString();
-        const cookieString = `token=${token}; expires=${expireDate};`;
-
-        document.cookie = cookieString;
-
-        if (result.status === 200) {
-          navigate('/');
-        }
-      } catch (error) {
-        setSnackbarOpen(true);
-      }
-    }
+    console.log({
+      email: data.get('email'),
+      password: data.get('password'),
+    });
   };
 
   return !loading ? (
-    <ThemeProvider theme={isDarkTheme ? createTheme(dark) : createTheme(light)}>
+    <ThemeProvider theme={theme}>
       <Container component='main' maxWidth='xs'>
         <CssBaseline />
         <Box
@@ -159,33 +119,43 @@ export default function SignIn() {
             <QrCode sx={{ fontSize: 35 }} />
           </Avatar>
           <Typography component='h1' variant='h5'>
-            Sign in
+            Sign up
           </Typography>
           <Box
             component='form'
-            onSubmit={handleSubmit}
             noValidate
+            onSubmit={handleSubmit}
             sx={{ mt: 3 }}
           >
-            <Grid container spacing={0}>
+            <Grid container spacing={2} sx={{ marginTop: 1 }}>
               <Grid item xs={12}>
                 <TextField
+                  autoComplete='given-name'
                   helperText={usernameError}
-                  error={usernameError ? usernameError.length > 0 : false}
-                  margin='normal'
+                  error={usernameError.length > 0}
+                  name='username'
                   required
                   fullWidth
                   id='username'
                   label='Username'
-                  name='username'
-                  autoComplete='username'
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  helperText={emailError}
+                  error={emailError.length > 0}
+                  required
+                  fullWidth
+                  id='email'
+                  label='Email Address'
+                  name='email'
+                  autoComplete='email'
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   helperText={passwordError}
-                  error={passwordError ? passwordError.length > 0 : false}
-                  margin='normal'
+                  error={passwordError.length > 0}
                   required
                   fullWidth
                   name='password'
@@ -210,34 +180,22 @@ export default function SignIn() {
                 />
               </Grid>
             </Grid>
-
             <Button
-              type='submit'
               size='large'
+              type='submit'
               fullWidth
               variant='contained'
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Sign Up
             </Button>
             <Grid container justifyContent='right'>
               <Grid item xs='auto'>
-                <Link href='/signup' variant='h6' underline='none'>
-                  Sign up
+                <Link href='/login' variant='h6' underline='none'>
+                  Sign in
                 </Link>
               </Grid>
             </Grid>
-            <Snackbar
-              open={snackbarOpen}
-              autoHideDuration={2500}
-              onClose={handleSnackbarClose}
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-              <Alert severity='error'>
-                Error while logging in. Please check your credentials and try
-                again.
-              </Alert>
-            </Snackbar>
           </Box>
         </Box>
       </Container>

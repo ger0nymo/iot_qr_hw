@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   HttpStatus,
+  HttpException,
   ExceptionFilter,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -14,15 +15,14 @@ import { v4 as uuidv4 } from 'uuid';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
+    private jwtService: JwtService
   ) {}
 
   async signIn(username, pass): Promise<any> {
     const user = await this.usersService.findOneByName(username);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
     const passwordMatch = await bcrypt.compare(pass, user.password);
 
     if (!passwordMatch) {
