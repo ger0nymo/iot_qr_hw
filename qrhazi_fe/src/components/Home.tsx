@@ -23,14 +23,16 @@ interface MyThemeOptions extends ThemeOptions {
   cantEnterBgColor: string;
 }
 
-const darkMode = localStorage.getItem('isDarkTheme') === 'true';
-
 export default function HomePage() {
   const [isLoading, setLoading] = React.useState(true);
   const [user, setUser] = React.useState<User | null>(null);
-  const [checked, setChecked] = React.useState(darkMode || false);
+  const [checked, setChecked] = React.useState(
+    localStorage.getItem('isDarkTheme') === 'true' || false
+  );
   const [navigationValue, setNavigationValue] = React.useState('profile');
-  const [isDarkTheme, setIsDarkTheme] = React.useState(darkMode || false);
+  const [isDarkTheme, setIsDarkTheme] = React.useState(
+    localStorage.getItem('isDarkTheme') === 'true' || false
+  );
 
   const light: MyThemeOptions = {
     palette: {

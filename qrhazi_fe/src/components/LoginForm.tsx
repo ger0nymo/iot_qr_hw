@@ -30,7 +30,6 @@ export default function SignIn() {
   const [usernameError, setUsernameError] = React.useState('');
   const [passwordError, setPasswordError] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
-  const [isDarkTheme, setIsDarkTheme] = React.useState(isDarkStored);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
@@ -40,10 +39,6 @@ export default function SignIn() {
     getUserData();
   }, []);
 
-  React.useEffect(() => {
-    localStorage.setItem('isDarkTheme', isDarkTheme.toString());
-  }, [isDarkTheme]);
-
   const getUserData = async () => {
     const user = await retrieveUser();
     if (user) {
@@ -52,21 +47,11 @@ export default function SignIn() {
     setLoading(false);
   };
 
-  const light = createTheme({
+  const theme = createTheme({
     palette: {
-      mode: 'light',
+      mode: localStorage.getItem('isDarkTheme') === 'true' ? 'dark' : 'light',
     },
   });
-
-  const dark = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  });
-
-  const changeTheme = () => {
-    setIsDarkTheme((isDarkTheme) => !isDarkTheme);
-  };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -144,7 +129,7 @@ export default function SignIn() {
   };
 
   return !loading ? (
-    <ThemeProvider theme={isDarkTheme ? createTheme(dark) : createTheme(light)}>
+    <ThemeProvider theme={theme}>
       <Container component='main' maxWidth='xs'>
         <CssBaseline />
         <Box
