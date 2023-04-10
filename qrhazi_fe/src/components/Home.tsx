@@ -18,6 +18,7 @@ import { ThemeOptions } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { QRPage } from './QrPage';
+import { AdminPanel } from './AdminPanel';
 
 interface MyThemeOptions extends ThemeOptions {
   canEnterBgColor: string;
@@ -76,7 +77,7 @@ export default function HomePage() {
 
   React.useEffect(() => {
     getUserData();
-  }, []);
+  }, [navigationValue]);
 
   const getUserData = async () => {
     const user = await retrieveUser();
@@ -223,10 +224,11 @@ export default function HomePage() {
           <BottomNavigationBar
             handleNavigationChange={handleNavigationChange}
             navigationValue={navigationValue}
+            isAdmin={user?.isAdmin}
           />
         </Box>
       </ThemeProvider>
-    ) : (
+    ) : navigationValue === 'qr_access' ? (
       <ThemeProvider
         theme={isDarkTheme ? createTheme(dark) : createTheme(light)}
       >
@@ -234,6 +236,18 @@ export default function HomePage() {
         <BottomNavigationBar
           handleNavigationChange={handleNavigationChange}
           navigationValue={navigationValue}
+          isAdmin={user?.isAdmin}
+        />
+      </ThemeProvider>
+    ) : (
+      <ThemeProvider
+        theme={isDarkTheme ? createTheme(dark) : createTheme(light)}
+      >
+        <AdminPanel />
+        <BottomNavigationBar
+          handleNavigationChange={handleNavigationChange}
+          navigationValue={navigationValue}
+          isAdmin={user?.isAdmin}
         />
       </ThemeProvider>
     )

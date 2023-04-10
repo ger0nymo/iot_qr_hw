@@ -1,10 +1,14 @@
 import { checkToken } from './auth';
+import axios from 'axios';
+
+const API_URL = 'https://qrhazi-backend.azurewebsites.net/users';
 
 export type User = {
   id: string;
   username: string;
   email: string;
   canEnter: boolean;
+  isAdmin: boolean;
 };
 
 export function retrieveCurrentToken() {
@@ -41,8 +45,65 @@ export async function retrieveUser() {
     username: result.data.username,
     email: result.data.email,
     canEnter: result.data.canEnter,
+    isAdmin: result.data.isAdmin,
   };
 
-  console.log(user);
   return user;
+}
+
+export async function updateUserCanEnter(
+  id: string,
+  toValue: boolean,
+  sender: string
+) {
+  const token = retrieveCurrentToken();
+
+  if (!token) {
+    return null;
+  }
+
+  const result = await axios.patch(
+    `${API_URL}/update-can-enter`,
+    {
+      id: id,
+      canEnter: toValue,
+      sender: sender,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (result.status !== 200) {
+    return null;
+  }
+
+  return result;
+}
+
+export async function getAllUsers() {
+  const token = retrieveCurrentToken();
+  const user = await retrieveUser();
+
+  if (!user?.isAdmin) {
+    return null;
+  }
+
+  if (!token) {
+    return null;
+  }
+
+  const result = await axios.get(`${API_URL}/get-all`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (result.status !== 200) {
+    return null;
+  }
+
+  return result;
 }

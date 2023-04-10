@@ -4,6 +4,7 @@ import QrIcon from '@mui/icons-material/QrCode';
 import ProfileIcon from '@mui/icons-material/AccountCircle';
 import Paper from '@mui/material/Paper';
 import React from 'react';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 export function BottomNavigationBar(props: any) {
   return (
@@ -25,6 +26,13 @@ export function BottomNavigationBar(props: any) {
           label='Profile'
           value='profile'
         />
+        {props.isAdmin ? (
+          <BottomNavigationAction
+            icon={<AdminPanelSettingsIcon sx={{ fontSize: 35 }} />}
+            label='Admin'
+            value='admin'
+          />
+        ) : null}
       </BottomNavigation>
     </Paper>
   );
