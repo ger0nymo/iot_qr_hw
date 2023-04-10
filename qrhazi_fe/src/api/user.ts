@@ -67,7 +67,6 @@ export async function updateUserCanEnter(
     {
       id: id,
       canEnter: toValue,
-      sender: sender,
     },
     {
       headers: {

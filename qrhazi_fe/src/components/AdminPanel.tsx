@@ -38,10 +38,6 @@ export function AdminPanel() {
     const sender = await retrieveUser();
     const toValue = !users.find((user) => user.id === id)?.canEnter;
 
-    console.log(id);
-    console.log(sender);
-    console.log(toValue);
-
     if (sender) {
       const result: any = await updateUserCanEnter(
         id,
