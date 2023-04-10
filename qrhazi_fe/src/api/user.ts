@@ -7,6 +7,19 @@ export type User = {
   canEnter: boolean;
 };
 
+export function retrieveCurrentToken() {
+  const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('token'))
+    ?.split('=')[1];
+
+  if (!token) {
+    return null;
+  }
+
+  return token;
+}
+
 export async function retrieveUser() {
   const token = document.cookie
     .split('; ')

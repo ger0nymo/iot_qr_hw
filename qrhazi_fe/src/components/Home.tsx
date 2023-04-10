@@ -17,6 +17,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material/styles';
 import { Button } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { QRPage } from './QrPage';
 
 interface MyThemeOptions extends ThemeOptions {
   canEnterBgColor: string;
@@ -226,13 +227,15 @@ export default function HomePage() {
         </Box>
       </ThemeProvider>
     ) : (
-      <>
-        <p>asd</p>
+      <ThemeProvider
+        theme={isDarkTheme ? createTheme(dark) : createTheme(light)}
+      >
+        <QRPage user={user} />
         <BottomNavigationBar
           handleNavigationChange={handleNavigationChange}
           navigationValue={navigationValue}
         />
-      </>
+      </ThemeProvider>
     )
   ) : (
     <Grid
