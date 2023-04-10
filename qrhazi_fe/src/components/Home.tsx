@@ -203,6 +203,7 @@ export default function HomePage() {
                   <Grid item xs={6} sx={{ textAlign: 'right' }}>
                     <Button
                       variant='contained'
+                      color='error'
                       endIcon={<LogoutIcon />}
                       sx={{ mt: 1 }}
                       onClick={() => {
