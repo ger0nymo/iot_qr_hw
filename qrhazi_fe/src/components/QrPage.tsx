@@ -42,11 +42,11 @@ export function QRPage(props: any) {
     },
   });
 
-  async function handleQrCreate(direction: boolean) {
+  async function handleQrCreate() {
     const token = retrieveCurrentToken();
 
     if (token) {
-      const qr = await createQR(props.user.username, direction, token);
+      const qr = await createQR(props.user.username, token);
       if (qr) {
         setShowQr(true);
         const interval = setInterval(() => {
@@ -131,19 +131,9 @@ export function QRPage(props: any) {
                     leaving.
                   </Typography>
                   <Button
-                    disabled={props.user?.isIn}
                     color='success'
                     variant='contained'
-                    onClick={() => handleQrCreate(true)}
-                    sx={{ width: '50%', margin: '0 auto' }}
-                  >
-                    Enter gate
-                  </Button>
-                  <Button
-                    disabled={!props.user?.isIn}
-                    color='success'
-                    variant='contained'
-                    onClick={() => handleQrCreate(false)}
+                    onClick={handleQrCreate}
                     sx={{ width: '50%', margin: '0 auto', mt: 2 }}
                   >
                     Exit gate
