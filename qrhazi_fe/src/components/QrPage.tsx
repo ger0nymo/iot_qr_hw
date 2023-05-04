@@ -42,11 +42,11 @@ export function QRPage(props: any) {
     },
   });
 
-  async function handleQrCreate() {
+  async function handleQrCreate(direction: boolean) {
     const token = retrieveCurrentToken();
 
     if (token) {
-      const qr = await createQR(props.user.username, token);
+      const qr = await createQR(props.user.username, direction, token);
       if (qr) {
         setShowQr(true);
         const interval = setInterval(() => {
@@ -127,15 +127,26 @@ export function QRPage(props: any) {
                       textAlign: 'center',
                     }}
                   >
-                    Press the button to create a QR code for the door camera.
+                    Press the button to generate a QR code for entering or
+                    leaving.
                   </Typography>
                   <Button
+                    disabled={props.user?.isIn}
                     color='success'
                     variant='contained'
-                    onClick={handleQrCreate}
+                    onClick={() => handleQrCreate(true)}
                     sx={{ width: '50%', margin: '0 auto' }}
                   >
-                    Genereate QR code
+                    Enter gate
+                  </Button>
+                  <Button
+                    disabled={!props.user?.isIn}
+                    color='success'
+                    variant='contained'
+                    onClick={() => handleQrCreate(false)}
+                    sx={{ width: '50%', margin: '0 auto', mt: 2 }}
+                  >
+                    Exit gate
                   </Button>
                 </CardContent>
               )
