@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-//const API_URL = 'https://qrhazi-backend.azurewebsites.net/qr';
-const API_URL = 'http://localhost:3001/qr';
+const API_URL = 'https://qrhazi-backend.azurewebsites.net/qr';
+//const API_URL = 'http://localhost:3001/qr';
 export async function createQR(
   username: string,
   direction: boolean,
