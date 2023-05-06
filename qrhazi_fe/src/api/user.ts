@@ -1,8 +1,8 @@
 import { checkToken } from './auth';
 import axios from 'axios';
 
-const API_URL = 'https://qrhazi-backend.azurewebsites.net/users';
-//const API_URL = 'http://localhost:3001/users';
+//const API_URL = 'https://qrhazi-backend.azurewebsites.net/users';
+const API_URL = 'http://localhost:3001/users';
 
 export type User = {
   id: string;

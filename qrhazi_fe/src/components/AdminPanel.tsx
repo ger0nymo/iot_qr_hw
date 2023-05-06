@@ -41,6 +41,7 @@ interface Log {
   username: string;
   date: string;
   id: string;
+  direction: string;
 }
 
 const Demo = styled('div')(({ theme }) => ({
@@ -98,9 +99,11 @@ export function AdminPanel() {
           username: log.username,
           date: log.date,
           id: log.id,
+          direction: log.in === 'true' ? 'In' : 'Out',
         };
       });
       setLogs(logs);
+      console.log(logs);
       setFilteredLogs(logs);
     }
     setLogsLoading(false);
@@ -220,7 +223,7 @@ export function AdminPanel() {
                     <TableRow>
                       <StyledTableCell
                         style={{
-                          backgroundColor: isDarkTheme ? 'black' : 'lightgray',
+                          backgroundColor: isDarkTheme ? 'black' : 'lightgray', fontWeight: 'bold'
                         }}
                       >
                         Username
@@ -228,10 +231,18 @@ export function AdminPanel() {
                       <StyledTableCell
                         align='right'
                         style={{
-                          backgroundColor: isDarkTheme ? 'black' : 'lightgray',
+                          backgroundColor: isDarkTheme ? 'black' : 'lightgray', fontWeight: 'bold'
                         }}
                       >
                         Date
+                      </StyledTableCell>
+                      <StyledTableCell
+                          align='right'
+                          style={{
+                            backgroundColor: isDarkTheme ? 'black' : 'lightgray', fontWeight: 'bold'
+                          }}
+                      >
+                        Direction
                       </StyledTableCell>
                     </TableRow>
                   </TableHead>
@@ -248,6 +259,7 @@ export function AdminPanel() {
                             {log.username}
                           </TableCell>
                           <TableCell align='right'>{log.date}</TableCell>
+                          <TableCell align='right'>{log.direction}</TableCell>
                         </TableRow>
                       ))
                     ) : (

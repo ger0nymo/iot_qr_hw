@@ -1,26 +1,14 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import QrCode from '@mui/icons-material/QrCode';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import IconButton from '@mui/material/IconButton';
-import { Card, CardContent, CardHeader, CardMedia } from '@mui/material';
+import {Alert, Card, CardContent} from '@mui/material';
 import QRCode from 'react-qr-code';
 import { createQR } from '../api/qr';
 import { retrieveCurrentToken } from '../api/user';
+import Snackbar from "@mui/material/Snackbar";
 
 export function QRPage(props: any) {
   const [isDarkTheme, setIsDarkTheme] = React.useState(
@@ -29,6 +17,9 @@ export function QRPage(props: any) {
   const [showQr, setShowQr] = React.useState(false);
   const [countdown, setCountdown] = React.useState(45);
   const [qrValue, setQrValue] = React.useState('');
+
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+    const [snackbarMessage, setSnackbarMessage] = React.useState('');
 
   const light = createTheme({
     palette: {
@@ -42,22 +33,27 @@ export function QRPage(props: any) {
     },
   });
 
-  async function handleQrCreate() {
+  async function handleQrCreate(direction: boolean) {
     const token = retrieveCurrentToken();
 
     if (token) {
-      const qr = await createQR(props.user.username, token);
-      if (qr) {
-        setShowQr(true);
-        const interval = setInterval(() => {
-          setCountdown((countdown) => countdown - 1);
-        }, 1000);
-        setQrValue(qr.data['qrCode']);
-        setTimeout(() => {
-          clearInterval(interval);
-          setShowQr(false);
-          setCountdown(45);
-        }, 45000);
+      try {
+        const qr = await createQR(props.user.username, direction, token);
+        if (qr) {
+          setShowQr(true);
+          const interval = setInterval(() => {
+            setCountdown((countdown) => countdown - 1);
+          }, 1000);
+          setQrValue(qr.data['qrCode']);
+          setTimeout(() => {
+            clearInterval(interval);
+            setShowQr(false);
+            setCountdown(45);
+          }, 45000);
+        }
+      } catch (error: any) {
+        setSnackbarMessage(error.response.data['message']);
+        setSnackbarOpen(true);
       }
     }
   }
@@ -133,11 +129,29 @@ export function QRPage(props: any) {
                   <Button
                     color='success'
                     variant='contained'
-                    onClick={handleQrCreate}
-                    sx={{ width: '50%', margin: '0 auto', mt: 2 }}
+                    onClick={() => handleQrCreate(true)}
+                    sx={{ width: '50%', margin: '0 auto'}}
+                  >
+                    Enter gate
+                  </Button>
+                  <Button
+                      color='success'
+                      variant='contained'
+                      onClick={() => handleQrCreate(false)}
+                      sx={{ width: '50%', margin: '0 auto', mt: 2 }}
                   >
                     Exit gate
                   </Button>
+                  <Snackbar
+                      open={snackbarOpen}
+                      autoHideDuration={2500}
+                      onClose={() => setSnackbarOpen(false)}
+                      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                  >
+                    <Alert severity='error'>
+                      {snackbarMessage}
+                    </Alert>
+                  </Snackbar>
                 </CardContent>
               )
             ) : (
